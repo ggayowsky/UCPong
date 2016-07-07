@@ -172,29 +172,30 @@ export default Ember.Component.extend(EKMixin, {
     }
 
     // Scoring Logic
-    if( ballXPosition < this._viewport.left) {
+    if( ballXPosition < this._viewport.left || ballXPosition > this._viewport.right) {
       this._ball.position.x = 0;
       this._ball.position.y = 0;
-      // Player 2 scored
-      this.set('score.1', this.get('score.1') + 1);
+
+      if( ballXPosition < this._viewport.left ) {
+        // Player 2 scored
+        this.set('score.1', this.get('score.1') + 1);
+      } else {
+        // Player 1 scored
+        this.set('score.0', this.get('score.0') + 1);
+      }
+
+
       this.get('webRTC').send({
         score: this.get('score')
       });
 
-      this._ballXDir = - this._ballXDir;
-      this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
-
-    } else if ( ballXPosition > this._viewport.right ) {
-      this._ball.position.x = 0;
-      this._ball.position.y = 0;
-      // Player 1scored
-      this.set('score.0', this.get('score.0') + 1);
-      this.get('webRTC').send({
-        score: this.get('score')
-      });
+      if(this.get('score.0') === 7 || this.get('score.1') === 7) {
+        // EXIT
+      }
 
       this._ballXDir = - this._ballXDir;
       this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
+
     } else {
       this._ball.position.x += this._ballXDir * ballSpeed;
     }
