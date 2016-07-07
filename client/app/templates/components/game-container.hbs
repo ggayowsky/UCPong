@@ -1,4 +1,11 @@
+<div class="player-info">
+{{#if webRTC.isHost}}
+  You are Player 1 (left side)
+{{else}}
+  You are player 2 (right side)
+{{/if}}
+</div>
 <div class="game-container" id={{gameContainerId}}></div>
 <div class="scoreboard">
-    Player 1   {{score.[0]}} - {{score.[1]}}    Player 2
+    Player 1<span class="spacer"></span>{{score.[0]}} - {{score.[1]}}<span class="spacer"></span>Player 2
 </div>
