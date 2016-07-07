@@ -16,6 +16,7 @@ export default Ember.Service.extend(Ember.Evented, {
                 this._socket.on('user-connected', this.userConnectedHandler.bind(this));
                 this._socket.on('user-disconnected', this.userDisconnectedHandler.bind(this));
                 this._socket.on('user-challenged', this.userChallengedHandler.bind(this));
+                this._socket.on('user-name-changed', this.userNameChangeHandler.bind(this));
                 this._socket.on('sdp-description', this.sdpDescriptionHandler.bind(this));
                 this._socket.on('ice-candidate', this.iceCandidateHandler.bind(this));
                 resolve();
@@ -45,6 +46,10 @@ export default Ember.Service.extend(Ember.Evented, {
         if(data && data.challengee && data.challengee.id === this.get('sessionId')) {
             this.trigger('user-challenged', data);
         }
+    },
+
+    userNameChangeHandler(data) {
+        this.trigger('user-name-changed', data.user);
     },
 
     sdpDescriptionHandler(data) {

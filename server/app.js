@@ -1,6 +1,7 @@
 var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var bodyParser = require('body-parser');
 
 const CONFIG = {
     PORT: 3000
@@ -20,6 +21,9 @@ io.on('connection', function(socket){
 server.listen(CONFIG.PORT, function(){
     console.log('listening on port 3000');
 });
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -42,7 +46,20 @@ app.get('/connectedUsers', function(req, res) {
 
 // Change display name of user
 app.post('/user/:id/name', function(req, res) {
+    var user = users.filter(user => {
+        var serializedUser = serializeUser(user);
+        return serializedUser.id === req.params.id;
+    }).pop();
 
+    if(user) {
+        user.name = req.body.name;
+    }
+
+    res.json(serializeUser(user));
+
+    io.emit('user-name-changed', {
+        user: serializeUser(user)
+    });
 });
 
 // Challenge user to a game

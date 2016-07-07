@@ -2,9 +2,12 @@ import Ember from 'ember';
 import ENV from 'pong/config/environment';
 
 export default Ember.Component.extend({
-    socket: Ember.inject.service(),
+    tagName: 'span',
 
-    name: null,
+    socket: Ember.inject.service(),
+    user: Ember.inject.service(),
+
+    name: Ember.computed.alias('user.current.name'),
 
     actions: {
         changeName() {
@@ -15,9 +18,7 @@ export default Ember.Component.extend({
                     let data = {
                         name: newName
                     };
-                    Ember.$.post(url, data, (result) => {
-                        console.log(result);
-                    });
+                    Ember.$.post(url, data);
                 });
         }
     }

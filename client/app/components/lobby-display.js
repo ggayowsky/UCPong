@@ -4,6 +4,9 @@ import ENV from 'pong/config/environment';
 export default Ember.Component.extend({
     socket: Ember.inject.service(),
     webRTC: Ember.inject.service('web-rtc'),
+    user: Ember.inject.service(),
+
+    currentUser: Ember.computed.alias('user.current'),
 
     users: null,
 
@@ -29,6 +32,13 @@ export default Ember.Component.extend({
 
             if(!Ember.isNone(challenger)) {
                 challenger.set('hasChallenged', true);
+            }
+        });
+
+        this.get('socket').on('user-name-changed', userData => {
+            let user = this.get('users').findBy('id', userData.id);
+            if(!Ember.isNone(user)) {
+                user.set('name', userData.name);
             }
         });
 
