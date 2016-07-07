@@ -204,32 +204,38 @@ export default Ember.Component.extend(EKMixin, {
   },
 
   _sendData() {
-    let webRTC = this.get('webRTC');
-    if(webRTC.get('isHost')) {
-      webRTC.send({
-        ball: this._ball.position,
-        localPaddle: this.myPaddle.position,
-        remotePaddel: this.paddle2.position
-      });
-    } else {
-      webRTC.send({
-        localPaddle: this.myPaddle.position
-      });
+    try {
+      let webRTC = this.get('webRTC');
+      if (webRTC.get('isHost')) {
+        webRTC.send({
+          ball: this._ball.position,
+          localPaddle: this.myPaddle.position,
+          remotePaddel: this.paddle2.position
+        });
+      } else {
+        webRTC.send({
+          localPaddle: this.myPaddle.position
+        });
+      }
+    } catch(err) {
+      console.log('error sending game data', err);
     }
   },
 
   _networkDataHandler(data) {
-    if(data.score) {
-      this.set('score', data.score);
-    }
+    if(!this.get('isDestroying') && !this.get('isDestroyed')) {
+      if (data.score) {
+        this.set('score', data.score);
+      }
 
-    if (data.localPaddle) {
-      this.paddle2.position.y = data.localPaddle.y;
-    }
+      if (data.localPaddle) {
+        this.paddle2.position.y = data.localPaddle.y;
+      }
 
-    if ( data.ball ) {
-      this._ball.position.x = data.ball.x;
-      this._ball.position.y = data.ball.y;
+      if (data.ball) {
+        this._ball.position.x = data.ball.x;
+        this._ball.position.y = data.ball.y;
+      }
     }
   }
 });

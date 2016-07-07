@@ -25,6 +25,7 @@ export default Ember.Route.extend({
     },
 
     gameEnded() {
+        this.get('webRTC').closeConnection();
         this.transitionTo('lobby');
     }
 });
