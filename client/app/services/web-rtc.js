@@ -74,15 +74,23 @@ export default Ember.Service.extend(Ember.Evented, {
 
     closeConnection() {
         let peerConnection = this.get('peerConnection');
+        if(!Ember.isNone(this._dataChannel)) {
+          this._dataChannel.close();
+          this._dataChannel = null;
+        }
         if(!Ember.isNone(peerConnection)) {
             this.set('isHost', null);
-            peerConnection.close();
+          // TODO: Why does this work? LOL
+            //peerConnection.close();
             this.set('peerConnection', null);
         }
     },
 
     send(data) {
         let dataChannel = this._dataChannel;
+        if(dataChannel.readyState !== 'open') {
+          return;
+        }
         if(!Ember.isNone(dataChannel)) {
             dataChannel.send(JSON.stringify(data));
         } else {
