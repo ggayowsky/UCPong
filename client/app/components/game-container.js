@@ -10,10 +10,13 @@ export default Ember.Component.extend(EKMixin, {
   // Services
   webRTC: Ember.inject.service('web-rtc'),
 
-  networkThrottle: 100,
+  score: null,
+
+  networkThrottle: 1,
 
   init: function() {
     this._super();
+    this.set('score', [0,0]);
     this.myPaddleHeight = 0;
     this._paddle2Height = 0;
     this._ballXDir = Math.round(Math.random()) === 0 ? -1 : 1;
@@ -80,12 +83,21 @@ export default Ember.Component.extend(EKMixin, {
     const paddleMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff } );
 
     this.myPaddle = new THREE.Mesh( paddleGeometry, paddleMaterial );
-    this.myPaddle.position.x = this._viewport.left + 10;
+    if(this.get('webRTC.isHost')) {
+      this.myPaddle.position.x = this._viewport.left + 10;
+    } else {
+      this.myPaddle.position.x = this._viewport.right - 10;
+    }
+
     this.myPaddle.position.y = this.myPaddleHeight;
     this._scene.add(this.myPaddle);
 
     this.paddle2 = new THREE.Mesh( paddleGeometry, paddleMaterial );
-    this.paddle2.position.x = this._viewport.right - 10;
+    if(this.get('webRTC.isHost')) {
+      this.paddle2.position.x = this._viewport.right - 10;
+    } else {
+      this.paddle2.position.x = this._viewport.left + 10;
+    }
     this.paddle2.position.y = this._paddle2Height;
     this._scene.add(this.paddle2);
   },
@@ -129,6 +141,10 @@ export default Ember.Component.extend(EKMixin, {
   }),
 
   _updateBall() {
+    if(!this.get('webRTC.isHost')) {
+      return;
+    }
+
     let ballYPosition = this._ball.position.y;
     let ballXPosition = this._ball.position.x;
 
@@ -158,11 +174,18 @@ export default Ember.Component.extend(EKMixin, {
     if( ballXPosition < this._viewport.left) {
       this._ball.position.x = 0;
       this._ball.position.y = 0;
+      // Player 2 scored
+      this.set('score.1', this.get('score.1') + 1);
+
       this._ballXDir = - this._ballXDir;
       this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
+
     } else if ( ballXPosition > this._viewport.right ) {
       this._ball.position.x = 0;
       this._ball.position.y = 0;
+      // Player 1scored
+      this.set('score.0', this.get('score.0') + 1);
+
       this._ballXDir = - this._ballXDir;
       this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
     } else {
@@ -177,17 +200,21 @@ export default Ember.Component.extend(EKMixin, {
     if(webRTC.get('isHost')) {
       webRTC.send({
         ball: this._ball.position,
-        localPaddle: this.paddle1.position,
+        localPaddle: this.myPaddle.position,
         remotePaddel: this.paddle2.position
       });
     } else {
       webRTC.send({
-        localPaddle: this.paddle1.position
+        localPaddle: this.myPaddle.position
       });
     }
   },
 
   _networkDataHandler(data) {
-    console.log(data);
+    this.paddle2.position.y = data.localPaddle.y;
+    if(!this.get('webRTC.isHost')) {
+      this._ball.position.x = data.ball.x;
+      this._ball.position.y = data.ball.y;
+    }
   }
 });
