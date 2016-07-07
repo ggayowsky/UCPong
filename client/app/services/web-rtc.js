@@ -4,6 +4,9 @@ export default Ember.Service.extend(Ember.Evented, {
     // Services
     socket: Ember.inject.service(),
 
+    // Properties
+    isConnected: null,
+
     // Lifecycle
     willDestroy() {
         let peerConnection = this.get('peerConnection');
@@ -44,7 +47,7 @@ export default Ember.Service.extend(Ember.Evented, {
 
         var dataChannelOptions = {
             ordered: false, // do not guarantee order
-            maxRetransmitTime: 3000, // in milliseconds
+            maxRetransmitTime: 3000 // in milliseconds
         };
 
         if(isCaller) {
@@ -66,6 +69,13 @@ export default Ember.Service.extend(Ember.Evented, {
         }
 
         return peerConnection;
+    },
+
+    closeConnection() {
+        let peerConnection = this.get('peerConnection');
+        if(!Ember.isNone(peerConnection)) {
+            peerConnection.close();
+        }
     },
 
     send(data) {
@@ -114,12 +124,15 @@ export default Ember.Service.extend(Ember.Evented, {
         };
 
         channel.onopen = () => {
+            this.set('isConnected', true);
             this.trigger('webrtc-ready');
             console.log('data channel opened!');
         };
 
         channel.onclose = () => {
             this._dataChannel = null;
+            this.set('isConnected', false);
+            this.trigger('webrtc-closed');
             console.log("The Data Channel is Closed");
         };
     },
