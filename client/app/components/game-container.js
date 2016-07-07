@@ -8,7 +8,7 @@ export default Ember.Component.extend(EKMixin, {
 
   init: function() {
     this._super();
-    this._paddle1Height = 0;
+    this.myPaddleHeight = 0;
     this._paddle2Height = 0;
     this._ballXDir = Math.round(Math.random()) === 0 ? -1 : 1;
     this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
@@ -72,10 +72,10 @@ export default Ember.Component.extend(EKMixin, {
     const  paddleGeometry = new THREE.BoxGeometry( paddleWidth, paddleHeight, 0 );
     const paddleMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff } );
 
-    this.paddle1 = new THREE.Mesh( paddleGeometry, paddleMaterial );
-    this.paddle1.position.x = this._viewport.left + 10;
-    this.paddle1.position.y = this._paddle1Height;
-    this._scene.add(this.paddle1);
+    this.myPaddle = new THREE.Mesh( paddleGeometry, paddleMaterial );
+    this.myPaddle.position.x = this._viewport.left + 10;
+    this.myPaddle.position.y = this.myPaddleHeight;
+    this._scene.add(this.myPaddle);
 
     this.paddle2 = new THREE.Mesh( paddleGeometry, paddleMaterial );
     this.paddle2.position.x = this._viewport.right - 10;
@@ -92,19 +92,19 @@ export default Ember.Component.extend(EKMixin, {
   },
 
   _movePaddle(direction) {
-    const bbox = new THREE.Box3().setFromObject(this.paddle1);
+    const bbox = new THREE.Box3().setFromObject(this.myPaddle);
 
     switch(direction) {
       case 'up':
         if(bbox.max.y + 1 < this._viewport.top ) {
-          this.paddle1.translateY(1);
-          this._paddle1Height++;
+          this.myPaddle.translateY(1);
+          this.myPaddleHeight++;
         }
         break;
       case 'down':
         if(bbox.min.y - 1 > this._viewport.bottom ) {
-          this.paddle1.translateY(-1);
-          this._paddle1Height--;
+          this.myPaddle.translateY(-1);
+          this.myPaddleHeight--;
         }
         break;
     }
@@ -133,11 +133,11 @@ export default Ember.Component.extend(EKMixin, {
     this._ball.position.y += this._ballYDir * ballSpeed;
 
     // Paddle Collision Logic
-    let paddle1bbox = new THREE.Box3().setFromObject(this.paddle1);
+    let myPaddlebbox = new THREE.Box3().setFromObject(this.myPaddle);
     let paddle2bbox = new THREE.Box3().setFromObject(this.paddle2);
 
-    if(paddle1bbox.min.x < ballXPosition && paddle1bbox.max.x > ballXPosition &&
-       paddle1bbox.min.y < ballYPosition && paddle1bbox.max.y > ballYPosition ) {
+    if(myPaddlebbox.min.x < ballXPosition && myPaddlebbox.max.x > ballXPosition &&
+      myPaddlebbox.min.y < ballYPosition && myPaddlebbox.max.y > ballYPosition ) {
       this._ballXDir = - this._ballXDir;
     }
 
