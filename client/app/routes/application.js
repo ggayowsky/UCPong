@@ -5,10 +5,9 @@ export default Ember.Route.extend({
     webRTC: Ember.inject.service('web-rtc'),
 
     beforeModel: function() {
-        this.get('webRTC').on('webrtc-ready', this.startGame.bind(this));
-    },
-
-    startGame() {
-        this.transitionTo('game');
+        return Ember.RSVP.all([
+            this.get('socket').setup(),
+            this.get('webRTC').setup()
+        ])
     }
 });

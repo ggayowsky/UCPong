@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-export default Ember.Service.extend({
+export default Ember.Service.extend(Ember.Evented, {
     // Services
     socket: Ember.inject.service(),
 
@@ -114,6 +114,7 @@ export default Ember.Service.extend({
         };
 
         channel.onopen = () => {
+            this.trigger('webrtc-ready');
             console.log('data channel opened!');
         };
 
