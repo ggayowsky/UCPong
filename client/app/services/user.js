@@ -23,7 +23,6 @@ export default Ember.Service.extend({
                 }));
 
                 this.get('socket').on('user-name-changed', userData => {
-                    console.log(userData);
                     if(userData.id === this.get('current.id')) {
                         this.set('current.name', userData.name);
                     }

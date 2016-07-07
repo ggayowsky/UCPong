@@ -4,7 +4,6 @@ export default Ember.Route.extend({
     webRTC: Ember.inject.service('web-rtc'),
 
     beforeModel() {
-        console.log(this.get('webRTC.isConnected'));
         if(!this.get('webRTC.isConnected')) {
             this.transitionTo('lobby');
         }
