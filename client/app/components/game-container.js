@@ -4,7 +4,13 @@ import { EKMixin, keyUp, keyDown } from 'ember-keyboard';
 const ballSpeed = 1.5;
 
 export default Ember.Component.extend(EKMixin, {
+  // Component properties
   classNames: ['game-container'],
+
+  // Services
+  webRTC: Ember.inject.service('web-rtc'),
+
+  networkThrottle: 100,
 
   init: function() {
     this._super();
@@ -13,6 +19,7 @@ export default Ember.Component.extend(EKMixin, {
     this._ballXDir = Math.round(Math.random()) === 0 ? -1 : 1;
     this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
 
+    this.get('webRTC').on('data', this._networkDataHandler.bind(this));
 
     Ember.run.scheduleOnce('afterRender', this, this.initScene);
   },
@@ -108,6 +115,7 @@ export default Ember.Component.extend(EKMixin, {
         }
         break;
     }
+    Ember.run.throttle(this, this._sendData, this.get('networkThrottle'));
   },
 
   keyDown: Ember.on(keyDown('ArrowUp'), function() {
@@ -145,6 +153,25 @@ export default Ember.Component.extend(EKMixin, {
       this._ball.position.x += this._ballXDir * ballSpeed;
     }
 
+    Ember.run.throttle(this, this._sendData, this.get('networkThrottle'));
+  },
 
+  _sendData() {
+    let webRTC = this.get('webRTC');
+    if(webRTC.get('isHost')) {
+      webRTC.send({
+        ball: this._ball.position,
+        localPaddle: this.paddle1.position,
+        remotePaddel: this.paddle2.position
+      });
+    } else {
+      webRTC.send({
+        localPaddle: this.paddle1.position
+      });
+    }
+  },
+
+  _networkDataHandler(data) {
+    console.log(data);
   }
 });
