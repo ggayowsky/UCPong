@@ -20,12 +20,12 @@ export default Ember.Route.extend({
     actions: {
         leaveGame() {
             this.get('webRTC').closeConnection();
-            this.transitionTo('lobby');
+            this.transitionTo('game-over');
         }
     },
 
     gameEnded() {
         this.get('webRTC').closeConnection();
-        this.transitionTo('lobby');
+        this.transitionTo('game-over');
     }
 });

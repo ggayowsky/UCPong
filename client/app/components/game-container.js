@@ -2,6 +2,7 @@ import Ember from 'ember';
 import { EKMixin, keyUp, keyDown } from 'ember-keyboard';
 
 const ballSpeed = 1.5;
+const paddleSpeed = 1.4;
 
 export default Ember.Component.extend(EKMixin, {
   // Component properties
@@ -119,13 +120,13 @@ export default Ember.Component.extend(EKMixin, {
     switch(direction) {
       case 'up':
         if(bbox.max.y + 1 < this._viewport.top ) {
-          this.myPaddle.translateY(1);
+          this.myPaddle.translateY(paddleSpeed);
           this.myPaddleHeight++;
         }
         break;
       case 'down':
         if(bbox.min.y - 1 > this._viewport.bottom ) {
-          this.myPaddle.translateY(-1);
+          this.myPaddle.translateY(-paddleSpeed);
           this.myPaddleHeight--;
         }
         break;
@@ -184,14 +185,13 @@ export default Ember.Component.extend(EKMixin, {
         this.set('score.0', this.get('score.0') + 1);
       }
 
+      if(this.get('score.0') === 7 || this.get('score.1') === 7) {
+        // EXIT
+      }
 
       this.get('webRTC').send({
         score: this.get('score')
       });
-
-      if(this.get('score.0') === 7 || this.get('score.1') === 7) {
-        // EXIT
-      }
 
       this._ballXDir = - this._ballXDir;
       this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
