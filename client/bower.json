@@ -6,6 +6,7 @@
     "ember-cli-test-loader": "0.2.2",
     "ember-qunit-notifications": "0.1.0",
     "bootstrap-sass": "^3.3.6",
-    "socket.io-client": "~1.4.8"
+    "socket.io-client": "~1.4.8",
+    "three.js": "^0.78.0"
   }
 }

@@ -34,7 +34,7 @@ export default Ember.Component.extend(EKMixin, {
       bottom: -height / 2,
       near: -100,
       far: 100
-    }
+    };
 
     let scene = new THREE.Scene();
     this._scene = scene;
