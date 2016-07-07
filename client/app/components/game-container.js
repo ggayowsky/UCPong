@@ -1,6 +1,8 @@
 import Ember from 'ember';
 import { EKMixin, keyUp, keyDown } from 'ember-keyboard';
 
+const ballSpeed = 1.5;
+
 export default Ember.Component.extend(EKMixin, {
   classNames: ['game-container'],
 
@@ -8,6 +10,9 @@ export default Ember.Component.extend(EKMixin, {
     this._super();
     this._paddle1Height = 0;
     this._paddle2Height = 0;
+    this._ballXDir = Math.round(Math.random()) === 0 ? -1 : 1;
+    this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
+
 
     Ember.run.scheduleOnce('afterRender', this, this.initScene);
   },
@@ -54,6 +59,8 @@ export default Ember.Component.extend(EKMixin, {
   },
 
   draw() {
+    this._updateBall();
+
     this._renderer.render(this._scene, this._camera);
 
     requestAnimationFrame(this.draw.bind(this));
@@ -77,11 +84,11 @@ export default Ember.Component.extend(EKMixin, {
   },
 
   _initBall() {
-    const ballSize = this._viewport.height * 0.01;
+    const ballSize = this._viewport.height * 0.02;
     const ballGeometry = new THREE.BoxGeometry( ballSize, ballSize, 0 );
     const ballMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    var ball = new THREE.Mesh( ballGeometry, ballMaterial );
-    this._scene.add( ball );
+    this._ball = new THREE.Mesh( ballGeometry, ballMaterial );
+    this._scene.add( this._ball );
   },
 
   _movePaddle(direction) {
@@ -91,11 +98,13 @@ export default Ember.Component.extend(EKMixin, {
       case 'up':
         if(bbox.max.y + 1 < this._viewport.top ) {
           this.paddle1.translateY(1);
+          this._paddle1Height++;
         }
         break;
       case 'down':
         if(bbox.min.y - 1 > this._viewport.bottom ) {
           this.paddle1.translateY(-1);
+          this._paddle1Height--;
         }
         break;
     }
@@ -109,5 +118,33 @@ export default Ember.Component.extend(EKMixin, {
   keyUp: Ember.on(keyDown('ArrowDown'), function() {
     console.log('Down pressed');
     this._movePaddle('down');
-  })
+  }),
+
+  _updateBall() {
+    let ballYPosition = this._ball.position.y;
+
+    if( ballYPosition + this._ballYDir * ballSpeed > this._viewport.top ||
+        ballYPosition + this._ballYDir * ballSpeed < this._viewport.bottom ) {
+      this._ballYDir = - this._ballYDir;
+    }
+
+    this._ball.position.y += this._ballYDir * ballSpeed;
+
+    let ballXPosition = this._ball.position.x;
+    if( ballXPosition < this._viewport.left) {
+      this._ball.position.x = 0;
+      this._ball.position.y = 0;
+      this._ballXDir = - this._ballXDir;
+      this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
+    } else if ( ballXPosition > this._viewport.right ) {
+      this._ball.position.x = 0;
+      this._ball.position.y = 0;
+      this._ballXDir = - this._ballXDir;
+      this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
+    } else {
+      this._ball.position.x += this._ballXDir * ballSpeed;
+    }
+
+
+  }
 });
