@@ -41,7 +41,7 @@ export default Ember.Component.extend(EKMixin, {
       bottom: -height / 2,
       near: -100,
       far: 100
-    }
+    };
 
     let scene = new THREE.Scene();
     this._scene = scene;
@@ -130,7 +130,9 @@ export default Ember.Component.extend(EKMixin, {
 
   _updateBall() {
     let ballYPosition = this._ball.position.y;
+    let ballXPosition = this._ball.position.x;
 
+    // Wall Collision Logic
     if( ballYPosition + this._ballYDir * ballSpeed > this._viewport.top ||
         ballYPosition + this._ballYDir * ballSpeed < this._viewport.bottom ) {
       this._ballYDir = - this._ballYDir;
@@ -138,7 +140,21 @@ export default Ember.Component.extend(EKMixin, {
 
     this._ball.position.y += this._ballYDir * ballSpeed;
 
-    let ballXPosition = this._ball.position.x;
+    // Paddle Collision Logic
+    let paddle1bbox = new THREE.Box3().setFromObject(this.paddle1);
+    let paddle2bbox = new THREE.Box3().setFromObject(this.paddle2);
+
+    if(paddle1bbox.min.x < ballXPosition && paddle1bbox.max.x > ballXPosition &&
+       paddle1bbox.min.y < ballYPosition && paddle1bbox.max.y > ballYPosition ) {
+      this._ballXDir = - this._ballXDir;
+    }
+
+    if(paddle2bbox.min.x < ballXPosition && paddle2bbox.max.x > ballXPosition &&
+      paddle2bbox.min.y < ballYPosition && paddle2bbox.max.y > ballYPosition ) {
+      this._ballXDir = - this._ballXDir;
+    }
+
+    // Scoring Logic
     if( ballXPosition < this._viewport.left) {
       this._ball.position.x = 0;
       this._ball.position.y = 0;
