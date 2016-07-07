@@ -1,8 +1,21 @@
-
+.player-info {
+  text-align: center;
+  font-size: 20px;
+}
 
 .game-container {
   width: 640px;
   height: 360px;
   margin: auto;
   align: center;
+}
+
+.scoreboard {
+  text-align: center;
+  font-size: 24px;
+  margin-top: 10px;
+
+  .spacer {
+    margin-left: 40px;
+  }
 }
