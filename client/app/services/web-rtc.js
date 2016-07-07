@@ -51,6 +51,7 @@ export default Ember.Service.extend(Ember.Evented, {
         };
 
         if(isCaller) {
+            this.set('isHost', true);
             var dataChannel =
                 peerConnection.createDataChannel("myLabel", dataChannelOptions);
 
@@ -74,6 +75,7 @@ export default Ember.Service.extend(Ember.Evented, {
     closeConnection() {
         let peerConnection = this.get('peerConnection');
         if(!Ember.isNone(peerConnection)) {
+            this.set('isHost', null);
             peerConnection.close();
         }
     },
@@ -81,7 +83,7 @@ export default Ember.Service.extend(Ember.Evented, {
     send(data) {
         let dataChannel = this._dataChannel;
         if(!Ember.isNone(dataChannel)) {
-            dataChannel.send(data);
+            dataChannel.send(JSON.stringify(data));
         } else {
             throw new Error('No data channel to send data with!');
         }
@@ -121,6 +123,7 @@ export default Ember.Service.extend(Ember.Evented, {
 
         channel.onmessage = event => {
             console.log("Got Data Channel Message:", event.data);
+            this.trigger('data', JSON.parse(event.data));
         };
 
         channel.onopen = () => {
