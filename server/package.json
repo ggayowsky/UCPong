@@ -9,6 +9,7 @@
   "author": "Christian Natis <natis.christian@gmail.com>",
   "license": "UNLICENSED",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "socket.io": "^1.4.8"
   }

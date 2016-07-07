@@ -1,8 +1,12 @@
 import Ember from 'ember';
+import ENV from 'pong/config/environment';
 
 export default Ember.Component.extend({
     socket: Ember.inject.service(),
     webRTC: Ember.inject.service('web-rtc'),
+    user: Ember.inject.service(),
+
+    currentUser: Ember.computed.alias('user.current'),
 
     users: null,
 
@@ -31,9 +35,16 @@ export default Ember.Component.extend({
             }
         });
 
+        this.get('socket').on('user-name-changed', userData => {
+            let user = this.get('users').findBy('id', userData.id);
+            if(!Ember.isNone(user)) {
+                user.set('name', userData.name);
+            }
+        });
+
         this.get('socket.initPromise')
             .then(() => {
-                Ember.$.getJSON('http://pong-cnatis.c9users.io:8080/connectedUsers', result => {
+                Ember.$.getJSON(`${ENV.HOST}/connectedUsers`, result => {
                     let sessionId = this.get('socket.sessionId');
                     this.get('users').pushObjects(result.users.filter(user => {
                         return user.id !== sessionId;
@@ -44,7 +55,7 @@ export default Ember.Component.extend({
 
     actions: {
         challenge(userId) {
-            let url = `http://pong-cnatis.c9users.io:8080/user/${this.get('socket.sessionId')}/challenge/${userId}`;
+            let url = `${ENV.HOST}/user/${this.get('socket.sessionId')}/challenge/${userId}`;
             Ember.$.post(url, {});
         },
 
