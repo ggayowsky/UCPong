@@ -5,7 +5,10 @@ const ballSpeed = 1.5;
 
 export default Ember.Component.extend(EKMixin, {
   // Component properties
-  classNames: ['game-container'],
+  classNames: [],
+  gameContainerId: Ember.computed('elementId', function() {
+    return `${this.elementId}-game-container`;
+  }),
 
   // Services
   webRTC: Ember.inject.service('web-rtc'),
@@ -32,7 +35,7 @@ export default Ember.Component.extend(EKMixin, {
   }),
 
   initScene() {
-    var canvas = document.getElementById(this.elementId);
+    var canvas = document.getElementById(this.get('gameContainerId'));
     let width = canvas.clientWidth;
     let height = canvas.clientHeight;
     this._viewport = {
@@ -131,12 +134,10 @@ export default Ember.Component.extend(EKMixin, {
   },
 
   keyDown: Ember.on(keyDown('ArrowUp'), function() {
-    console.log('Up pressed');
     this._movePaddle('up');
   }),
 
   keyUp: Ember.on(keyDown('ArrowDown'), function() {
-    console.log('Down pressed');
     this._movePaddle('down');
   }),
 
