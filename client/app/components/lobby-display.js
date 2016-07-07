@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import ENV from 'pong/config/environment';
 
 export default Ember.Component.extend({
     socket: Ember.inject.service(),
@@ -33,7 +34,7 @@ export default Ember.Component.extend({
 
         this.get('socket.initPromise')
             .then(() => {
-                Ember.$.getJSON('http://pong-cnatis.c9users.io:8080/connectedUsers', result => {
+                Ember.$.getJSON(`${ENV.HOST}/connectedUsers`, result => {
                     let sessionId = this.get('socket.sessionId');
                     this.get('users').pushObjects(result.users.filter(user => {
                         return user.id !== sessionId;
@@ -44,7 +45,7 @@ export default Ember.Component.extend({
 
     actions: {
         challenge(userId) {
-            let url = `http://pong-cnatis.c9users.io:8080/user/${this.get('socket.sessionId')}/challenge/${userId}`;
+            let url = `${ENV.HOST}/user/${this.get('socket.sessionId')}/challenge/${userId}`;
             Ember.$.post(url, {});
         },
 

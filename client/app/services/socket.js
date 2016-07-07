@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import ENV from 'pong/config/environment';
+
 export default Ember.Service.extend(Ember.Evented, {
     // Properties
     initPromise: null,
@@ -8,7 +10,7 @@ export default Ember.Service.extend(Ember.Evented, {
     // Methods
     setup() {
         this.set('initPromise', new Ember.RSVP.Promise((resolve) => {
-            this._socket = io('pong-cnatis.c9users.io:8080');
+            this._socket = io(ENV.HOST);
             this._socket.on('connect', () => {
                 this.set('sessionId', this._socket.id);
                 this._socket.on('user-connected', this.userConnectedHandler.bind(this));
