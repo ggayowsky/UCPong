@@ -7,7 +7,7 @@
     "doc": "doc",
     "test": "tests"
   },
-  "scripts": {boe
+  "scripts": {
     "build": "ember build",
     "start": "ember server",
     "test": "ember test"

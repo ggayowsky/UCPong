@@ -16,3 +16,5 @@ bower_components
 npm-debug.log
 testem.log
 .idea/
+client/tmp/
+client/dist/
