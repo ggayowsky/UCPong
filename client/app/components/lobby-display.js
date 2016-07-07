@@ -33,7 +33,7 @@ export default Ember.Component.extend({
 
         this.get('socket.initPromise')
             .then(() => {
-                Ember.$.getJSON('http://localhost:3000/connectedUsers', result => {
+                Ember.$.getJSON('http://pong-cnatis.c9users.io:8080/connectedUsers', result => {
                     let sessionId = this.get('socket.sessionId');
                     this.get('users').pushObjects(result.users.filter(user => {
                         return user.id !== sessionId;
@@ -44,7 +44,7 @@ export default Ember.Component.extend({
 
     actions: {
         challenge(userId) {
-            let url = `http://localhost:3000/user/${this.get('socket.sessionId')}/challenge/${userId}`;
+            let url = `http://pong-cnatis.c9users.io:8080/user/${this.get('socket.sessionId')}/challenge/${userId}`;
             Ember.$.post(url, {});
         },
 

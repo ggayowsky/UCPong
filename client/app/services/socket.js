@@ -8,7 +8,7 @@ export default Ember.Service.extend(Ember.Evented, {
     // Methods
     setup() {
         this.set('initPromise', new Ember.RSVP.Promise((resolve) => {
-            this._socket = io('localhost:3000');
+            this._socket = io('pong-cnatis.c9users.io:8080');
             this._socket.on('connect', () => {
                 this.set('sessionId', this._socket.id);
                 this._socket.on('user-connected', this.userConnectedHandler.bind(this));
