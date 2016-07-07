@@ -21,6 +21,9 @@ module.exports = function(defaults) {
     // along with the exports of each module as its value.
 
     app.import('bower_components/socket.io-client/socket.io.js');
-
+    app.import({
+      development: 'bower_components/three.js/build/three.js',
+      production: 'bower_components/three.js/build/three.min.js'
+    });
     return app.toTree();
 };

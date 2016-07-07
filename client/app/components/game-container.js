@@ -5,51 +5,76 @@ export default Ember.Component.extend({
 
   init: function() {
     this._super();
-    Ember.run.scheduleOnce('afterRender', this, this.initCanvas);
+    Ember.run.scheduleOnce('afterRender', this, this.initScene);
   },
 
   canvasId: Ember.computed('elementId', function() {
     return `${this.elementId}-game-canvas`;
   }),
 
-  initCanvas() {
-    var canvas = document.getElementById(this.get('canvasId'));
-    // Initialize the GL context
-    let gl = this._initWebGL(canvas);
-    this._gl = gl;
-
-    if(gl) {
-      gl.clearColor(0.0, 0.0, 0.0, 1.0);
-      // Enable depth testing
-      gl.enable(gl.DEPTH_TEST);
-      // Near things obscure far things
-      gl.depthFunc(gl.LEQUAL);
-      // Clear the color as well as the depth buffer.
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    } else {
-      // RIP
+  initScene() {
+    var canvas = document.getElementById(this.elementId);
+    let width = canvas.clientWidth;
+    let height = canvas.clientHeight;
+    this._viewport = {
+      height: height,
+      width: width,
+      left: -width / 2,
+      right: width / 2,
+      top: height / 2,
+      bottom: -height / 2,
+      near: -100,
+      far: 100
     }
+
+    let scene = new THREE.Scene();
+    this._scene = scene;
+
+    this._camera = new THREE.OrthographicCamera(
+      this._viewport.left,
+      this._viewport.right,
+      this._viewport.top,
+      this._viewport.bottom,
+      this._viewport.near,
+      this._viewport.far);
+
+    let renderer = new THREE.WebGLRenderer();
+    this._renderer = renderer;
+    renderer.setSize(width, height);
+    canvas.appendChild(renderer.domElement);
+
+    this.draw();
   },
 
   draw() {
+    this._drawPaddles();
+    this._drawBall();
+
+    this._renderer.render(this._scene, this._camera);
+
     requestAnimationFrame(this.draw.bind(this));
   },
 
-  _initWebGL(canvas) {
-    let gl = null;
+  _drawPaddles() {
+    let paddleHeight = this._viewport.height * 0.1;
+    let paddleWidth = this._viewport.width * 0.01;
+    let paddleGeometry = new THREE.BoxGeometry( paddleWidth, paddleHeight, 0 );
+    let paddleMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff } );
 
-    try {
-      // Try to grab the standard context. If it fails, fallback to experimental.
-      gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    }
-    catch(e) {}
+    let paddle1 = new THREE.Mesh( paddleGeometry, paddleMaterial );
+    paddle1.position.x = this._viewport.left + 10;
+    this._scene.add(paddle1);
 
-    // If we don't have a GL context, give up now
-    if (!gl) {
-      alert("Unable to initialize WebGL. Your browser may not support it.");
-      gl = null;
-    }
+    var paddle2 = new THREE.Mesh( paddleGeometry, paddleMaterial );
+    paddle2.position.x = this._viewport.right - 10;
+    this._scene.add(paddle2);
+  },
 
-    return gl;
+  _drawBall() {
+    let ballSize = this._viewport.height * 0.01;
+    var geometry = new THREE.BoxGeometry( ballSize, ballSize, 0 );
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var cube = new THREE.Mesh( geometry, material );
+    this._scene.add( cube );
   }
 });
