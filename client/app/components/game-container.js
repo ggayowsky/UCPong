@@ -48,13 +48,12 @@ export default Ember.Component.extend(EKMixin, {
     canvas.appendChild(renderer.domElement);
 
     this._initPaddles();
+    this._initBall();
 
     this.draw();
   },
 
   draw() {
-    this._drawBall();
-
     this._renderer.render(this._scene, this._camera);
 
     requestAnimationFrame(this.draw.bind(this));
@@ -77,21 +76,27 @@ export default Ember.Component.extend(EKMixin, {
     this._scene.add(this.paddle2);
   },
 
-  _drawBall() {
-    let ballSize = this._viewport.height * 0.01;
-    var geometry = new THREE.BoxGeometry( ballSize, ballSize, 0 );
-    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    var cube = new THREE.Mesh( geometry, material );
-    this._scene.add( cube );
+  _initBall() {
+    const ballSize = this._viewport.height * 0.01;
+    const ballGeometry = new THREE.BoxGeometry( ballSize, ballSize, 0 );
+    const ballMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var ball = new THREE.Mesh( ballGeometry, ballMaterial );
+    this._scene.add( ball );
   },
 
   _movePaddle(direction) {
+    const bbox = new THREE.Box3().setFromObject(this.paddle1);
+
     switch(direction) {
       case 'up':
-        this.paddle1.position.y++;
+        if(bbox.max.y + 1 < this._viewport.top ) {
+          this.paddle1.translateY(1);
+        }
         break;
       case 'down':
-        this.paddle1.position.y--;
+        if(bbox.min.y - 1 > this._viewport.bottom ) {
+          this.paddle1.translateY(-1);
+        }
         break;
     }
   },
