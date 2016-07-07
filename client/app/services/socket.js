@@ -35,7 +35,7 @@ export default Ember.Service.extend(Ember.Evented, {
 
     userDisconnectedHandler(data) {
         if(data && data.user && data.user.id !== this.get('sessionId')) {
-            this.trigger('user-disconnected', Ember.Object.create(data.user));
+            this.trigger('user-disconnected', data.user.id);
         }
     },
 

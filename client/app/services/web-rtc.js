@@ -118,11 +118,10 @@ export default Ember.Service.extend(Ember.Evented, {
         this._dataChannel = channel;
 
         channel.onerror = function (error) {
-            console.log("Data Channel Error:", error);
+            console.log('Data Channel Error:', error);
         };
 
         channel.onmessage = event => {
-            console.log("Got Data Channel Message:", event.data);
             this.trigger('data', JSON.parse(event.data));
         };
 
@@ -136,7 +135,7 @@ export default Ember.Service.extend(Ember.Evented, {
             this._dataChannel = null;
             this.set('isConnected', false);
             this.trigger('webrtc-closed');
-            console.log("The Data Channel is Closed");
+            console.log('The Data Channel is Closed');
         };
     },
 

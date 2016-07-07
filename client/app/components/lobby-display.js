@@ -17,9 +17,9 @@ export default Ember.Component.extend({
             }
         });
 
-        this.get('socket').on('user-disconnected', user => {
+        this.get('socket').on('user-disconnected', userId => {
             this.set('users', this.get('users').filter(existingUser => {
-                return existingUser.id !== user.id;
+                return existingUser.id !== userId;
             }));
         });
 
