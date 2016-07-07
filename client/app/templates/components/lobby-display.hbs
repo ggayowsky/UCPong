@@ -1,0 +1,16 @@
+<h3>Connected Users</h3>
+<p>Your ID: {{socket.sessionId}}</p>
+<ul>
+    {{#each users as |user|}}
+        <li>
+            {{user.name}}
+            {{#if user.hasChallenged}}
+                <a {{action 'acceptChallenge' user.id}}>Accept Challenge!</a>
+            {{else}}
+                <a {{action 'challenge' user.id}}>Challenge!</a>
+            {{/if}}
+        </li>
+    {{else}}
+        <li>No connected users!</li>
+    {{/each}}
+</ul>
