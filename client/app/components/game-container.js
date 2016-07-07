@@ -177,6 +177,9 @@ export default Ember.Component.extend(EKMixin, {
       this._ball.position.y = 0;
       // Player 2 scored
       this.set('score.1', this.get('score.1') + 1);
+      this.get('webRTC').send({
+        score: this.get('score')
+      });
 
       this._ballXDir = - this._ballXDir;
       this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
@@ -186,6 +189,9 @@ export default Ember.Component.extend(EKMixin, {
       this._ball.position.y = 0;
       // Player 1scored
       this.set('score.0', this.get('score.0') + 1);
+      this.get('webRTC').send({
+        score: this.get('score')
+      });
 
       this._ballXDir = - this._ballXDir;
       this._ballYDir = Math.round(Math.random()) === 0 ? -1 : 1;
@@ -212,8 +218,15 @@ export default Ember.Component.extend(EKMixin, {
   },
 
   _networkDataHandler(data) {
-    this.paddle2.position.y = data.localPaddle.y;
-    if(!this.get('webRTC.isHost')) {
+    if(data.score) {
+      this.set('score', data.score);
+    }
+
+    if (data.localPaddle) {
+      this.paddle2.position.y = data.localPaddle.y;
+    }
+
+    if ( data.ball ) {
       this._ball.position.x = data.ball.x;
       this._ball.position.y = data.ball.y;
     }
