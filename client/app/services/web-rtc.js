@@ -77,6 +77,7 @@ export default Ember.Service.extend(Ember.Evented, {
         if(!Ember.isNone(peerConnection)) {
             this.set('isHost', null);
             peerConnection.close();
+            this.set('peerConnection', null);
         }
     },
 
